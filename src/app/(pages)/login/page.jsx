@@ -24,7 +24,8 @@ export default function page() {
   });
 
   useEffect(() => {
-    if (admin) {
+    const result = JSON.parse(localStorage.getItem("admin")) || admin;
+    if (result) {
       router.push("/");
     } else {
       document.title = "Kirish";
@@ -36,6 +37,7 @@ export default function page() {
       login(data.admin)
         .then((res) => {
           setAdmin(res);
+          localStorage.setItem("admin", JSON.stringify(res));
           router.push("/");
         })
         .catch(({ message }) => {
