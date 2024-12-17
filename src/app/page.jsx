@@ -1,15 +1,26 @@
 "use client";
+import { useRouter } from "next/navigation";
+import { useAppStore } from "@/lib/zustand";
+import { useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import SidebarForm from "../components/SidebarForm";
 import { useState } from "react";
 
-export default function () {
+export default function page() {
+  const { admin } = useAppStore();
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const router = useRouter();
+  useEffect(() => {
+    const result = JSON.parse(localStorage.getItem("admin")) || admin;
+    if (result === null) {
+      router.push("/login");
+    }
+  }, []);
 
   return (
-    <div className="container mx-auto px-5 ">
+  <div className="container mx-auto px-5 ">
       <nav className="flex justify-between items-center mt-3 flex-wrap gap-5">
         <Image
           src="/chizlab-logo.svg"
