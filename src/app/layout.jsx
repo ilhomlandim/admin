@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
+import UniversalSheet from "@/components/ui/UniversalSheet";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,6 +26,7 @@ export default function RootLayout({ children }) {
       >
         {children}
         <Toaster position="top-right" visibleToasts={1} closeButton />
+        <UniversalSheet />
       </body>
     </html>
   );
