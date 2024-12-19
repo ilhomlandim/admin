@@ -8,6 +8,7 @@ export const useAppStore = create((set) => {
       title: null,
       description: null,
       children: null,
+      height: null,
     },
     setAdmin(admin) {
       return set(() => {

@@ -26,3 +26,12 @@ export function validate(element, type) {
     return false;
   }
 }
+
+export function getUntilNow(start) {
+  const now = new Date().getFullYear();
+  const years = [];
+  for (let i = start; i <= now; i++) {
+    years.push(i);
+  }
+  return years;
+}

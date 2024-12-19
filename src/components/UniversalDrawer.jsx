@@ -8,16 +8,28 @@ import {
 } from "@/components/ui/sheet";
 import { useAppStore } from "@/lib/zustand";
 
-export default function UniversalSheet() {
+export default function UniversalDrawer() {
   const { addItemDrawer, setAddItemDrawer } = useAppStore();
   return (
     <Sheet open={addItemDrawer.modal} onOpenChange={setAddItemDrawer}>
-      <SheetContent>
-        <SheetHeader>
+      <SheetContent
+        style={{
+          maxWidth: `${addItemDrawer.width}%`,
+          width: "100%",
+        }}
+      >
+        <SheetHeader className="py-1">
           <SheetTitle>{addItemDrawer.title}</SheetTitle>
           <SheetDescription>{addItemDrawer.description}</SheetDescription>
         </SheetHeader>
-        {addItemDrawer.children}
+        <div
+          style={{
+            maxHeight: "calc(100% - 70px)",
+          }}
+          className="h-full overflow-y-auto py-5"
+        >
+          {addItemDrawer.children}
+        </div>
       </SheetContent>
     </Sheet>
   );
