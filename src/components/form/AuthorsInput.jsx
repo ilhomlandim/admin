@@ -52,6 +52,7 @@ export default function AuthoursInput() {
           <Input
             onKeyPress={(e) => {
               if (e.charCode === 13) {
+                e.preventDefault();
                 handleAdd();
               }
             }}
