@@ -10,6 +10,8 @@ export const useAppStore = create((set) => {
       children: null,
       height: null,
     },
+    gKeywords: [],
+    gAuthors: [],
     setAdmin(admin) {
       return set(() => {
         return { admin };
@@ -17,9 +19,22 @@ export const useAppStore = create((set) => {
     },
     setAddItemDrawer(value) {
       return set((state) => {
-        console.log({ ...value, modal: !state.addItemDrawer.modal });
         return {
           addItemDrawer: { ...value, modal: !state.addItemDrawer.modal },
+        };
+      });
+    },
+    setGKeywords(gKeywords) {
+      return set(() => {
+        return {
+          gKeywords,
+        };
+      });
+    },
+    setGAuthors(gAuthors) {
+      return set(() => {
+        return {
+          gAuthors,
         };
       });
     },
