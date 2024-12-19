@@ -1,9 +1,8 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/lib/zustand";
-import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
-import { PlusCircledIcon } from "@radix-ui/react-icons";
+import Header from "@/components/Header";
 
 export default function page() {
   const { admin, setAddItemDrawer } = useAppStore();
@@ -17,20 +16,8 @@ export default function page() {
   }, []);
 
   return (
-    <div>
-      <Button
-        onClick={() => {
-          setAddItemDrawer({
-            modal: true,
-            title: "Salom",
-            description: "Alik",
-            children: <Button />,
-          });
-        }}
-      >
-        <PlusCircledIcon className="mr-1" />
-        Qo'shish
-      </Button>
-    </div>
+    <>
+      <Header />
+    </>
   );
 }
