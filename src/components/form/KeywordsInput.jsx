@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
@@ -7,8 +7,10 @@ import { Badge } from "../ui/badge";
 import { toast } from "sonner";
 import { warnMessages } from "@/constants";
 import { XIcon } from "lucide-react";
+import { useAppStore } from "@/lib/zustand";
 
 export default function KeywordsInput() {
+  const { setGKeywords } = useAppStore();
   const inputRef = useRef(null);
   const [keywords, setKeywords] = useState([]);
   function handleAdd() {
@@ -43,6 +45,10 @@ export default function KeywordsInput() {
     const result = keywords.filter((keyword) => keyword !== id);
     setKeywords(result);
   }
+
+  useEffect(() => {
+    setGKeywords(keywords);
+  }, [keywords]);
 
   return (
     <div>

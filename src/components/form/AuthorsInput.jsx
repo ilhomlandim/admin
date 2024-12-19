@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
@@ -7,10 +7,13 @@ import { Badge } from "../ui/badge";
 import { toast } from "sonner";
 import { warnMessages } from "@/constants";
 import { XIcon } from "lucide-react";
+import { useAppStore } from "@/lib/zustand";
 
 export default function AuthoursInput() {
+  const { setGAuthors } = useAppStore();
   const inputRef = useRef(null);
   const [authors, setAuthors] = useState([]);
+
   function handleAdd() {
     const value = inputRef.current.value;
     const length = value.trim().length;
@@ -43,6 +46,10 @@ export default function AuthoursInput() {
     const result = authors.filter((keyword) => keyword !== id);
     setAuthors(result);
   }
+
+  useEffect(() => {
+    setGAuthors(authors);
+  }, [authors]);
 
   return (
     <div>
