@@ -28,6 +28,17 @@ export const warnMessages = {
     passsword: "Maxfiy so'zni kiriting",
     inputKeywords: "Kalit so'zni kiriting",
     inputAuthors: "Muallifni kiriting",
+    title: "Sarlavhani kiriting",
+    volume: "Sahifalar sonini kiriting",
+    cover: "Rasm uchun havolani kiriting",
+    publishedAt: "Chop etilgan yilni tanlang",
+    country: "Davlatni tanlang",
+    language: "Tilni tanlang",
+    resourceType: "Resurs turini tanlang",
+    source: "Manbaa uchun havolani kiriting",
+    summary: "Tavsif yozing",
+    authors: "Mualliflarni kiririting",
+    keywords: "Kalit so'zlarni kiriting!",
   },
   length: {
     inputKeywords: "Kalit so'z eng kamida 2 ta belgidan iborat bo'lishi kerak",
@@ -36,19 +47,6 @@ export const warnMessages = {
   has: {
     inputKeywords: "Ushbu kalit so'z allaqachon qo'shilgan",
     inputAuthors: "Ushbu muallif allaqachon qo'shilgan",
-  },
-  form: {
-    title: "Sarlavha majburiy!",
-    volume: "Sahifalar soni majburiy va raqam bo'lishi kerak!",
-    cover: "Rasm uchun havola to'g'ri kiritilmagan!",
-    publishedAt: "Chop etilgan yilni tanlang!",
-    country: "Davlatni tanlang!",
-    language: "Tilni tanlang!",
-    resourceType: "Resurs turini tanlang!",
-    source: "Manbaa uchun havola to'g'ri kiritilmagan!",
-    summary: "Tavsif majburiy!",
-    authors: "Mualliflar kiritilmagan!",
-    keywords: "Kalit so'zlar kiritilmagan!",
   },
 };
 

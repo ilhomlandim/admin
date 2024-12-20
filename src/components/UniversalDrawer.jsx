@@ -26,7 +26,7 @@ export default function UniversalDrawer() {
           style={{
             maxHeight: "calc(100% - 70px)",
           }}
-          className="h-full overflow-y-auto py-5"
+          className="h-full overflow-y-auto py-5 scroll-smooth"
         >
           {addItemDrawer.children}
         </div>
