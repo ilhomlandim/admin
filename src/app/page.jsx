@@ -2,10 +2,10 @@
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/lib/zustand";
 import { useEffect } from "react";
-import Header from "@/components/Header";
+import TableData from "@/components/TableData";
 
 export default function page() {
-  const { admin, setAddItemDrawer } = useAppStore();
+  const { admin } = useAppStore();
   const router = useRouter();
 
   useEffect(() => {
@@ -17,7 +17,7 @@ export default function page() {
 
   return (
     <>
-      <Header />
+      <TableData />
     </>
   );
 }

@@ -1,3 +1,4 @@
+"use client";
 import { PlusCircledIcon } from "@radix-ui/react-icons";
 import { Button } from "./ui/button";
 import Image from "next/image";

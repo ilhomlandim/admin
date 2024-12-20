@@ -1,3 +1,4 @@
+"use client";
 import { form } from "@/constants";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
