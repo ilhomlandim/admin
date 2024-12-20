@@ -6,8 +6,10 @@ import { useAppStore } from "@/lib/zustand";
 import AddMaterialForm from "./form/AddMaterialForm";
 
 export default function Header() {
-  const { setAddItemDrawer } = useAppStore();
+  const { setAddItemDrawer, setCounter } = useAppStore();
   function handleDrawer() {
+    setCounter(1);
+
     setAddItemDrawer({
       title: "Yangi material qo'shish",
       description:

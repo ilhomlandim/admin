@@ -2,9 +2,11 @@ import { baseURL, errorMessages } from "@/constants";
 import { useRouter } from "next/router";
 import { toast } from "sonner";
 
-const admin = JSON.parse(localStorage.getItem("admin"));
-const token = admin ? admin.access_token : "";
-const router = useRouter();
+const getToken = () => {
+  const admin = JSON.parse(localStorage.getItem("admin"));
+  return admin ? admin.access_token : "";
+};
+
 export async function login(admin) {
   const req = await fetch(baseURL + "/auth/login", {
     method: "POST",
@@ -12,7 +14,6 @@ export async function login(admin) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(admin),
-    Authorization: `Bearer ${token}`,
   });
 
   if (req.status === 200) {
@@ -28,14 +29,15 @@ export async function login(admin) {
 }
 
 // POST request
-export async function postData(endpoint = "", data) {
-  const req = await fetch(endpoint ? baseURL + endpoint : baseURL, {
+export async function postData(data, endpoint = "") {
+  token = getToken();
+  const req = await fetch("/materials/" + baseURL, {
     method: "POST",
     headers: {
+      Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify(data),
-    Authorization: `Bearer ${token}`,
   });
 
   if (req.status === 200) {
@@ -45,7 +47,6 @@ export async function postData(endpoint = "", data) {
   } else if (req.status === 403) {
     setTimeout(() => {
       localStorage.removeItem("admin");
-      router.push("/login");
     }, 3000);
 
     throw new Error(errorMessages.unknownToken);
@@ -60,6 +61,8 @@ export async function postData(endpoint = "", data) {
 
 // GET request
 export async function getRequest(endpoint = "") {
+  token = getToken();
+
   const req = await fetch(endpoint ? baseURL + endpoint : baseURL, {
     method: "GET",
     headers: {
@@ -84,6 +87,8 @@ export async function getRequest(endpoint = "") {
 
 // DELETE request
 export async function deleteRequest(endpoint = "") {
+  token = getToken();
+
   const req = await fetch(endpoint ? baseURL + endpoint : baseURL, {
     method: "DELETE",
     headers: {
@@ -101,7 +106,7 @@ export async function deleteRequest(endpoint = "") {
     } else if (req.status === 403) {
       setTimeout(() => {
         localStorage.removeItem("admin");
-        router.push("/login");
+        // router.push("/login");
       }, 3000);
       throw new Error(errorMessages.unknownToken);
     } else if (req.status === 404) {
