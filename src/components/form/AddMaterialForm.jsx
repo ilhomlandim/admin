@@ -16,16 +16,34 @@ import { BookmarkIcon } from "@radix-ui/react-icons";
 import { getFormData } from "@/lib/utils";
 import { useAppStore } from "@/lib/zustand";
 
+import { toast } from "sonner";
+import Validation from "./Validation";
+
 export default function AddMaterialForm() {
   const { gAuthors, gKeywords } = useAppStore();
   function handleSubmit(e) {
     e.preventDefault();
+
     const data = getFormData(e.target);
-    // Set extra data
+
+    // const data = {
+    //   ...getFormData(e.target),
+    //   authors: gAuthors || [],
+    //   keywords: gKeywords || [],
+    // };
+
     data.authors = gAuthors;
     data.keywords = gKeywords;
-    const result = data;
-    console.log(result);
+    console.log(data);
+
+    const { validate } = Validation(data);
+
+    let errors = validate();
+    console.log(errors);
+
+    errors.length < 1
+      ? toast.success("Form muvaffaqiyatli to'ldirildi!")
+      : toast.error("Validatsiyada xatoliklar mavjud!");
   }
   return (
     <form onSubmit={handleSubmit} className="flex flex-col pl-1 pr-2 gap-y-6">

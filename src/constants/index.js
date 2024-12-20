@@ -23,6 +23,19 @@ export const warnMessages = {
     inputKeywords: "Ushbu kalit so'z allaqachon qo'shilgan",
     inputAuthors: "Ushbu muallif allaqachon qo'shilgan",
   },
+  form: {
+    title: "Sarlavha majburiy!",
+    volume: "Sahifalar soni majburiy va raqam bo'lishi kerak!",
+    cover: "Rasm uchun havola to'g'ri kiritilmagan!",
+    publishedAt: "Chop etilgan yilni tanlang!",
+    country: "Davlatni tanlang!",
+    language: "Tilni tanlang!",
+    resourceType: "Resurs turini tanlang!",
+    source: "Manbaa uchun havola to'g'ri kiritilmagan!",
+    summary: "Tavsif majburiy!",
+    authors: "Mualliflar kiritilmagan!",
+    keywords: "Kalit so'zlar kiritilmagan!",
+  },
 };
 
 export const form = {
