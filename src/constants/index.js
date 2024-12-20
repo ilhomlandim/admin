@@ -6,8 +6,7 @@ export const errorMessages = {
   200: "Tizimga muvaffaqiyatli kirdingiz",
   400: "Login yoki maxfiy so'zni noto'g'ri kiritdingiz",
   unknown: "Nimadur xato ketdi",
-  unknownToken: "Token bilan bog'liq muammo yuzaga keldi ",
-
+  unknownToken: "Token bilan bog'liq muammo yuzaga keldi",
   post: {
     succesfulyAdd: "Muaffaqiyatli malumot qoshildi",
     unknownPost: "Malumot jonatishda xatolik yuzaga keldi",

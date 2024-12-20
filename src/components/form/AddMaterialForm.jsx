@@ -67,7 +67,7 @@ export default function AddMaterialForm() {
         <div className="grid w-full items-center gap-1.5 col-start-1 col-end-3">
           <Label htmlFor="cover">Rasm uchun havola*</Label>
           <Input
-            type="url"
+            type="text"
             id="cover"
             name="cover"
             placeholder="Rasm uchun havolanini kiriting"
@@ -154,7 +154,7 @@ export default function AddMaterialForm() {
         <div className="grid w-full items-center gap-1.5">
           <Label htmlFor="source">Manbaa*</Label>
           <Input
-            type="url"
+            type="text"
             id="source"
             name="source"
             placeholder="Manbaa uchun havolanini kiriting"
