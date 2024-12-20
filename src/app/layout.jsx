@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import UniversalDrawer from "@/components/UniversalDrawer";
+import Header from "@/components/Header";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,7 +25,8 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased h-full`}
       >
-        {children}
+        <Header />
+        <main>{children}</main>
         <Toaster position="top-right" visibleToasts={1} closeButton />
         <UniversalDrawer />
       </body>

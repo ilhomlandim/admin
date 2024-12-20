@@ -3,8 +3,8 @@ import { useRouter } from "next/router";
 import { toast } from "sonner";
 
 const admin = JSON.parse(localStorage.getItem("admin"));
-const token = admin ? admin.access_token : "";
-const router = useRouter();
+// const token = admin ? admin.access_token : "";
+// const router = useRouter();
 export async function login(admin) {
   const req = await fetch(baseURL + "/auth/login", {
     method: "POST",
@@ -59,18 +59,11 @@ export async function postData(endpoint = "", data) {
 }
 
 // GET request
-export async function getRequest(endpoint = "") {
-  const req = await fetch(endpoint ? baseURL + endpoint : baseURL, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
+export async function getAllData(route) {
+  const req = await fetch(baseURL + route);
   if (req.status === 200) {
-    const res = await req.json();
-    return res;
+    const { data } = await req.json();
+    return data;
   } else {
     if (req.status == 400) {
       throw new Error(errorMessages.get.unknownGet);
