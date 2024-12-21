@@ -37,7 +37,7 @@ export default function UniversalDrawer() {
           <SheetDescription>
             {counter == "more"
               ? "Qo'shimcha ma'lumotlar qo'shilmoqda"
-              : counter}
+              : "Qoshilayotkan ma'lumotlar soni:" + counter}
           </SheetDescription>
 
           <Select
@@ -60,7 +60,7 @@ export default function UniversalDrawer() {
               <SelectItem value="3">3</SelectItem>
               <SelectItem value="4">4</SelectItem>
               <SelectItem value="5">5</SelectItem>
-              <SelectItem value="more">more</SelectItem>
+              <SelectItem value="more">Aniq emas</SelectItem>
             </SelectContent>
           </Select>
         </SheetHeader>

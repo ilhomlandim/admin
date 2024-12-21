@@ -28,10 +28,11 @@ export async function login(admin) {
   }
 }
 
-// POST request
 export async function postData(data, endpoint = "") {
-  token = getToken();
-  const req = await fetch("/materials/" + baseURL, {
+  const token = getToken();
+  const router = useRouter();
+
+  const req = await fetch(baseURL + "/materials/" + endpoint, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -39,16 +40,19 @@ export async function postData(data, endpoint = "") {
     },
     body: JSON.stringify(data),
   });
+  // console.log(req);
 
   if (req.status === 200) {
     toast.success(errorMessages.succesfulyAdd);
     const res = await req.json();
     return res;
   } else if (req.status === 403) {
+    toast.error("Token vaqti tugagan iltimos qayta royhattan oting");
+
     setTimeout(() => {
+      router.push("/login");
       localStorage.removeItem("admin");
     }, 3000);
-
     throw new Error(errorMessages.unknownToken);
   } else if (req.status === 400) {
     throw new Error(errorMessages.post.unknownPost);
@@ -59,82 +63,71 @@ export async function postData(data, endpoint = "") {
   }
 }
 
+//
+
+//
+
 // GET request
 export async function getRequest(endpoint = "") {
-  token = getToken();
+  const token = getToken();
 
-  const req = await fetch(endpoint ? baseURL + endpoint : baseURL, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  try {
+    const req = await fetch(baseURL + "/materials/" + endpoint, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
 
-  if (req.status === 200) {
-    const res = await req.json();
-    return res;
-  } else {
-    if (req.status == 400) {
-      throw new Error(errorMessages.get.unknownGet);
-    } else if (req.status == 403) {
+    if (req.status == 200) {
+      const res = await req.json();
+      // console.log("API javobi:", res);
+      return res;
+    } else if (req.status === 403) {
       throw new Error(errorMessages.unknownToken);
-    } else {
+    } else if (req.status === 400) {
+      throw new Error("Noto'g'ri so'rov.");
+    } else if (req.status === 500) {
       throw new Error(errorMessages.get.unknownServer);
+    } else {
+      throw new Error(`Xato: ${req.status}`);
     }
+  } catch (error) {
+    console.error("Fetch xatosi:", error);
+    throw error;
   }
 }
 
 // DELETE request
-export async function deleteRequest(endpoint = "") {
-  token = getToken();
 
-  const req = await fetch(endpoint ? baseURL + endpoint : baseURL, {
+export async function deleteData(id = "", router = null) {
+  const token = getToken();
+
+  const req = await fetch(baseURL + "/materials/" + id, {
     method: "DELETE",
     headers: {
-      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
     },
   });
 
   if (req.status === 200) {
-    const res = await req.json();
-    return res;
+    toast.success("Ma'lumot ochirildi");
+    return true;
+  } else if (req.status === 403) {
+    toast.error(errorMessages.unknownToken);
+
+    setTimeout(() => {
+      router.push("/login");
+      localStorage.removeItem("admin");
+    }, 3000);
+    throw new Error(errorMessages.unknownToken);
+  } else if (req.status === 400) {
+    throw new Error(errorMessages.post.unknownDelete);
+  } else if (req.status === 500) {
+    throw new Error(errorMessages.post.unknownServer);
   } else {
-    if (req.status === 400) {
-      throw new Error(errorMessages.delete.unknownDelete);
-    } else if (req.status === 403) {
-      setTimeout(() => {
-        localStorage.removeItem("admin");
-        // router.push("/login");
-      }, 3000);
-      throw new Error(errorMessages.unknownToken);
-    } else if (req.status === 404) {
-      throw new Error(errorMessages.delete.notFound);
-    } else {
-      throw new Error(errorMessages.unknownServer);
-    }
+    throw new Error(req.status);
   }
 }
-
-// request examples
-
-// delete request
-// {deleteRequest("/resurs/1")
-//   .then((response) => {
-//    toast.succes("Resurs o'chirildi:", response);
-//   })
-//   .catch((error) => {
-//     toast.error("Xato:", error.message);
-//   });
-// }
-
-// get materoials
-// async function fetchUsers() {
-//   try {
-//     const data = await getRequest(endpoint); // getRequest funksiyasini chaqiramiz
-//     toast.succes("Foydalanuvchilar:", data); // Olingan foydalanuvchilarni chiqarish
-//   } catch (error) {
-//     toast.error("Xato:", error.message); // Agar xato bo'lsa, konsolga chiqarish
-//   }
-// }

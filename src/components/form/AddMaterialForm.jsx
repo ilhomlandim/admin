@@ -39,10 +39,9 @@ export default function AddMaterialForm() {
     const checkedResult = validate(data, "form");
 
     if (checkedResult === false) {
-      postData(data.admin)
+      postData(data)
         .then((response) => {
           toast.success("Data successfully posted:", response);
-
           setCounter((prev) => (prev === "more" ? "more" : prev - 1));
         })
         .catch(({ message }) => {
