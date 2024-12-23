@@ -16,27 +16,52 @@ import { Button } from "../ui/button";
 import { BookmarkIcon } from "@radix-ui/react-icons";
 import { getFormData, validate } from "@/lib/utils";
 import { useAppStore } from "@/lib/zustand";
-
 import { toast } from "sonner";
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
+import { getAllData, postData } from "@/requests";
+import { useRouter } from "next/navigation";
 
 export default function AddMaterialForm() {
-  const { gAuthors, gKeywords } = useAppStore();
-  function handleSubmit(e) {
+  const router = useRouter();
+  const [isDisabled, setIsDisabled] = useState(false);
+  const { gAuthors, gKeywords, counter, setCounter } = useAppStore();
+
+  async function handleSubmit(e) {
     e.preventDefault();
+    console.log(e, "submited 28");
+    console.log(counter);
+
+    setIsDisabled(true);
 
     const data = {
       ...getFormData(e.target),
       authors: gAuthors,
       keywords: gKeywords,
     };
+
     const checkedResult = validate(data, "form");
+    console.log(checkedResult);
+
     if (checkedResult === false) {
-      console.log(data);
-    } else {
-      const { message, target } = checkedResult;
-      toast.warning(message, { position: "top-left" });
-      e.target[target].focus();
+      console.log("validate successfuly");
+
+      postData(data, router)
+        .then((response) => {
+          toast.success("Data successfully posted:", response);
+          let newCount = counter == "more" ? "more" : counter - 1;
+          setCounter(newCount);
+        })
+        .catch(({ message }) => {
+          toast.error(message);
+        })
+        .finally(() => {
+          setIsDisabled(false);
+          console.log("end posting");
+        });
     }
+
+    setIsDisabled(false);
   }
   return (
     <form onSubmit={handleSubmit} className="flex flex-col pl-1 pr-2 gap-y-6">
@@ -187,10 +212,17 @@ export default function AddMaterialForm() {
         <Button type="reset" variant="outline">
           Bekor qilish
         </Button>
-        <Button type="submit">
-          <BookmarkIcon className="mr-[2px]" />
-          Saqlash
-        </Button>
+        {isDisabled ? (
+          <Button disabled>
+            <Loader2 className="animate-spin" />
+            Iltimos kuting
+          </Button>
+        ) : (
+          <Button type="submit">
+            <BookmarkIcon className="mr-[2px]" />
+            Saqlash
+          </Button>
+        )}
       </div>
     </form>
   );

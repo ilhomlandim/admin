@@ -7,7 +7,7 @@ import { useAppStore } from "@/lib/zustand";
 import AddMaterialForm from "./form/AddMaterialForm";
 
 export default function Header() {
-  const { setAddItemDrawer } = useAppStore();
+  const { setCounter, counter, setAddItemDrawer } = useAppStore();
   function handleDrawer() {
     setAddItemDrawer({
       title: "Yangi material qo'shish",
@@ -29,7 +29,12 @@ export default function Header() {
           width="170"
           height="40"
         />
-        <Button onClick={handleDrawer}>
+        <Button
+          onClick={() => {
+            setCounter(1);
+            handleDrawer();
+          }}
+        >
           <PlusCircledIcon className="mr-[2px]" />
           Qo'shish
         </Button>

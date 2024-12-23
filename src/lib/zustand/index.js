@@ -12,6 +12,7 @@ export const useAppStore = create((set) => {
     },
     gKeywords: [],
     gAuthors: [],
+    counter: 1,
     setAdmin(admin) {
       return set(() => {
         return { admin };
@@ -35,6 +36,13 @@ export const useAppStore = create((set) => {
       return set(() => {
         return {
           gAuthors,
+        };
+      });
+    },
+    setCounter(counter) {
+      return set(() => {
+        return {
+          counter,
         };
       });
     },

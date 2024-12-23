@@ -43,7 +43,7 @@ export default function TableData() {
           {data.map(({ id, title, language, country, volume }) => (
             <TableRow key={id}>
               <TableCell className="font-medium text-left">{id}</TableCell>
-              <TableCell>{title}</TableCell>
+              <TableCell className="relative">{title}</TableCell>
               <TableCell>{language}</TableCell>
               <TableCell>{country}</TableCell>
               <TableCell className="text-right">{volume}</TableCell>
