@@ -25,10 +25,8 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased h-full`}
       >
-        <Header />
-        <main>{children}</main>
+        {children}
         <Toaster position="top-right" visibleToasts={1} closeButton />
-        <UniversalDrawer />
       </body>
     </html>
   );

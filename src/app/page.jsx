@@ -3,6 +3,8 @@ import { useRouter } from "next/navigation";
 import { useAppStore } from "@/lib/zustand";
 import { useEffect } from "react";
 import TableData from "@/components/TableData";
+import Header from "@/components/Header";
+import UniversalDrawer from "@/components/UniversalDrawer";
 
 export default function page() {
   const { admin } = useAppStore();
@@ -17,7 +19,11 @@ export default function page() {
 
   return (
     <>
-      <TableData />
+      <Header />
+      <main>
+        <TableData />
+      </main>
+      <UniversalDrawer />
     </>
   );
 }
