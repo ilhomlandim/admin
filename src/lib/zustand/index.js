@@ -39,12 +39,5 @@ export const useAppStore = create((set) => {
         };
       });
     },
-    setCounter(counter) {
-      return set(() => {
-        return {
-          counter,
-        };
-      });
-    },
   };
 });

@@ -1,5 +1,5 @@
 "use client";
-import { form } from "@/constants";
+import { errorMessages, form } from "@/constants";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import {
@@ -13,55 +13,73 @@ import KeywordsInput from "./KeywordsInput";
 import AuthoursInput from "./AuthorsInput";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
-import { BookmarkIcon } from "@radix-ui/react-icons";
+import { BookmarkIcon, PlusIcon } from "@radix-ui/react-icons";
 import { getFormData, validate } from "@/lib/utils";
 import { useAppStore } from "@/lib/zustand";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
-import { getAllData, postData } from "@/requests";
 import { useRouter } from "next/navigation";
+import { addData } from "@/requests";
 
 export default function AddMaterialForm() {
   const router = useRouter();
-  const [isDisabled, setIsDisabled] = useState(false);
-  const { gAuthors, gKeywords, counter, setCounter } = useAppStore();
+  const [data, setData] = useState({
+    addedData: null,
+    isLoading: false,
+    action: "one",
+  });
 
-  async function handleSubmit(e) {
+  const { gAuthors, gKeywords, setAddItemDrawer } = useAppStore();
+
+  useEffect(() => {
+    if (data.addedData) {
+      addData("/materials", data.addedData)
+        .then(({ data, message }) => {
+          toast.success(message);
+        })
+        .catch(({ message }) => {
+          if (message === errorMessages[403]) {
+            setAdmin(null);
+            router.push("/");
+            if (typeof window !== "undefined") {
+              localStorage.removeItem("user");
+            }
+          }
+          toast.error(message);
+        })
+        .finally(() => {
+          setData((prev) => {
+            return { ...prev, isLoading: false, addedData: null };
+          });
+          if (data.action === "one") {
+            setAddItemDrawer(null);
+          }
+        });
+    }
+  }, [data.addedData]);
+
+  function handleSubmit(e) {
     e.preventDefault();
-    console.log(e, "submited 28");
-    console.log(counter);
+    const action = e.nativeEvent.submitter.getAttribute("id");
 
-    setIsDisabled(true);
-
-    const data = {
+    const result = {
       ...getFormData(e.target),
       authors: gAuthors,
       keywords: gKeywords,
     };
 
-    const checkedResult = validate(data, "form");
-    console.log(checkedResult);
+    const checkedResult = validate(result, "form");
 
     if (checkedResult === false) {
-      console.log("validate successfuly");
-
-      postData(data, router)
-        .then((response) => {
-          toast.success("Data successfully posted:", response);
-          let newCount = counter == "more" ? "more" : counter - 1;
-          setCounter(newCount);
-        })
-        .catch(({ message }) => {
-          toast.error(message);
-        })
-        .finally(() => {
-          setIsDisabled(false);
-          console.log("end posting");
-        });
+      setData((prev) => {
+        return { ...prev, isLoading: true, addedData: result, action };
+      });
+    } else {
+      const { target, message } = checkedResult;
+      toast.warning(message);
+      e.target[target].focus();
     }
-
-    setIsDisabled(false);
   }
   return (
     <form onSubmit={handleSubmit} className="flex flex-col pl-1 pr-2 gap-y-6">
@@ -110,7 +128,7 @@ export default function AddMaterialForm() {
             <SelectContent>
               {form.publishedAt.map((year) => {
                 return (
-                  <SelectItem key={year} value={`${year}`}>
+                  <SelectItem key={year} value={year.toString()}>
                     {year}
                   </SelectItem>
                 );
@@ -209,20 +227,35 @@ export default function AddMaterialForm() {
 
       {/* Actions  */}
       <div className="flex justify-end gap-3">
-        <Button type="reset" variant="outline">
+        <Button
+          onClick={() => {
+            setAddItemDrawer(null);
+          }}
+          type="reset"
+          variant="outline"
+        >
           Bekor qilish
         </Button>
-        {isDisabled ? (
-          <Button disabled>
-            <Loader2 className="animate-spin" />
-            Iltimos kuting
-          </Button>
-        ) : (
-          <Button type="submit">
-            <BookmarkIcon className="mr-[2px]" />
-            Saqlash
+
+        {!data.isLoading && (
+          <Button type="submit" id="one" variant="secondary">
+            <PlusIcon className="mr-[2px]" />
+            Qo'shish
           </Button>
         )}
+        <Button id="more" disabled={data.isLoading}>
+          {data.isLoading ? (
+            <>
+              <Loader2 className="animate-spin" />
+              Qo'shilmoqda...
+            </>
+          ) : (
+            <>
+              <BookmarkIcon className="mr-[2px]" />
+              Saqlash
+            </>
+          )}
+        </Button>
       </div>
     </form>
   );
