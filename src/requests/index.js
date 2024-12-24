@@ -2,10 +2,10 @@ import { baseURL, errorMessages } from "@/constants";
 import { useRouter } from "next/router";
 import { toast } from "sonner";
 
-const admin = JSON.parse(localStorage.getItem("admin"));
+const admin = {}; // JSON.parse(localStorage.getItem("admin"));
 
 const getToken = () => {
-  const admin = JSON.parse(localStorage.getItem("admin"));
+  const admin = {}; // JSON.parse(localStorage.getItem("admin"));
   return admin ? admin.access_token : "";
 };
 
