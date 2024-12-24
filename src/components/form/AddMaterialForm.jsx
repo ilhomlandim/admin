@@ -30,7 +30,7 @@ export default function AddMaterialForm() {
     action: "one",
   });
 
-  const { gAuthors, gKeywords, setAddItemDrawer } = useAppStore();
+  const { gAuthors, gKeywords, setAddItemDrawer, setAdmin } = useAppStore();
 
   useEffect(() => {
     if (data.addedData) {
