@@ -11,7 +11,7 @@ export default function page() {
   const router = useRouter();
 
   useEffect(() => {
-    if ("localStorage" in window) {
+    if (typeof window !== "undefined") {
       const result = JSON.parse(localStorage.getItem("admin")) || admin;
       if (result === null) {
         router.push("/login");

@@ -24,7 +24,7 @@ export default function page() {
   });
 
   useEffect(() => {
-    const result = JSON.parse(localStorage.getItem("admin")) || admin;
+    const result = {};
     if (result) {
       router.push("/");
     } else {
@@ -37,7 +37,7 @@ export default function page() {
       login(data.admin)
         .then((res) => {
           setAdmin(res);
-          localStorage.setItem("admin", JSON.stringify(res));
+          // localStorage.setItem("admin", JSON.stringify(res));
           router.push("/");
         })
         .catch(({ message }) => {
