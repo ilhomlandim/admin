@@ -11,12 +11,10 @@ import { UpdateIcon } from "@radix-ui/react-icons";
 import { useAppStore } from "@/lib/zustand";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { warnMessages } from "@/constants";
 
 export default function page() {
   const inputUsername = useRef(null);
-  const inputPassword = useRef(null);
-  const { setAdmin, admin } = useAppStore();
+  const { setAdmin } = useAppStore();
   const router = useRouter();
   const [data, setData] = useState({
     admin: null,
@@ -24,7 +22,11 @@ export default function page() {
   });
 
   useEffect(() => {
-    const result = {};
+    let result;
+    if (typeof window !== "undefined") {
+      result = JSON.parse(localStorage.getItem("admin"));
+    }
+
     if (result) {
       router.push("/");
     } else {
@@ -35,18 +37,25 @@ export default function page() {
   useEffect(() => {
     if (data.admin) {
       login(data.admin)
-        .then((res) => {
-          setAdmin(res);
-          // localStorage.setItem("admin", JSON.stringify(res));
+        .then(({ data, message }) => {
+          setAdmin(data);
+          if (typeof window !== "undefined") {
+            localStorage.setItem("admin", JSON.stringify(data));
+          }
+          toast.success(message);
           router.push("/");
         })
         .catch(({ message }) => {
-          setData({ ...data, admin: null });
+          setData((prev) => {
+            return { ...prev, admin: null };
+          });
           inputUsername.current.focus();
           toast.error(message);
         })
         .finally(() => {
-          setData({ ...data, isLoading: false });
+          setData((prev) => {
+            return { ...prev, isLoading: false };
+          });
         });
     }
   }, [data.admin]);
@@ -56,15 +65,13 @@ export default function page() {
     const result = getFormData(e.target);
     const checkedResult = validate(result, "login");
     if (checkedResult === false) {
-      setData({ ...data, isLoading: true, admin: result });
+      setData((prev) => {
+        return { ...prev, isLoading: true, admin: result };
+      });
     } else {
-      if (checkedResult === warnMessages.empty.username) {
-        inputUsername.current.focus();
-      }
-      if (checkedResult === warnMessages.empty.passsword) {
-        inputPassword.current.focus();
-      }
-      toast.info(checkedResult);
+      const { target, message } = checkedResult;
+      e.target[target].focus();
+      toast.warning(message);
     }
   }
 
@@ -99,7 +106,6 @@ export default function page() {
             <Label htmlFor="password">Maxfiy so'z</Label>
             <Input
               className="bg-primary-foreground w-full"
-              ref={inputPassword}
               type="text"
               id="password"
               name="password"

@@ -18,10 +18,16 @@ export function getFormData(form) {
 export function validate(element, type) {
   if (type === "login") {
     if (element.username.trim() === "") {
-      return warnMessages.empty.username;
+      return {
+        target: "username",
+        message: warnMessages.empty.username,
+      };
     }
     if (element.password.trim() === "") {
-      return warnMessages.empty.passsword;
+      return {
+        target: "password",
+        message: warnMessages.empty.passsword,
+      };
     }
     return false;
   } else if (type === "form") {
