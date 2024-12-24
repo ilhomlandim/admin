@@ -11,9 +11,11 @@ export default function page() {
   const router = useRouter();
 
   useEffect(() => {
-    const result = JSON.parse(localStorage.getItem("admin")) || admin;
-    if (result === null) {
-      router.push("/login");
+    if ("localStorage" in window) {
+      const result = JSON.parse(localStorage.getItem("admin")) || admin;
+      if (result === null) {
+        router.push("/login");
+      }
     }
   }, []);
 
