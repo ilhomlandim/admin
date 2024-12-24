@@ -2,23 +2,17 @@ import { getUntilNow } from "@/lib/utils";
 
 export const baseURL = "https://json-api.uz/api/project/chizlab";
 
+export const successMessages = {
+  login: "Tizimga muvaffaqiyatli kirdingiz",
+  add: "Yangi ma'lumot qo'shildi",
+  delete: "Ma'lumot o'chirildi",
+  update: "Ma'lumot yangilandi",
+};
+
 export const errorMessages = {
-  200: "Tizimga muvaffaqiyatli kirdingiz",
-  400: "Login yoki maxfiy so'zni noto'g'ri kiritdingiz",
+  login: "Login yoki maxfiy so'zni noto'g'ri kiritdingiz",
   unknown: "Nimadur xato ketdi",
-  unknownToken: "Token bilan bog'liq muammo yuzaga keldi",
-  post: {
-    succesfulyAdd: "Muaffaqiyatli malumot qoshildi",
-    unknownPost: "Malumot jonatishda xatolik yuzaga keldi",
-  },
-  get: {
-    unknownGet: "Malumot qabul qilishda xatolik yuzaga keldi",
-    unknownServer: "Server xatoligi yuz berdi, keyinroq urinib koring",
-  },
-  delete: {
-    unknownDelete: "Ochirishda xatolik yuz berdi",
-    notFound: "Bunday resurs topilmadi",
-  },
+  403: "Tizimga qayta kiring",
 };
 
 export const warnMessages = {

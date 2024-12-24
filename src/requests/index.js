@@ -1,42 +1,45 @@
-import { baseURL, errorMessages } from "@/constants";
-import { useRouter } from "next/router";
-import { toast } from "sonner";
+import { baseURL, errorMessages, successMessages } from "@/constants";
 
-const admin = {}; // JSON.parse(localStorage.getItem("admin"));
+let admin;
+if (typeof window !== "undefined") {
+  admin = JSON.parse(localStorage.getItem("admin"));
+}
 
-const getToken = () => {
-  const admin = {}; // JSON.parse(localStorage.getItem("admin"));
-  return admin ? admin.access_token : "";
-};
+const token = admin ? admin.access_token : null;
 
-// const token = admin ? admin.access_token : "";
-// const router = useRouter();
-
-export async function login(admin) {
+// Login
+export async function login(data) {
   const req = await fetch(baseURL + "/auth/login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(admin),
+    body: JSON.stringify(data),
   });
-
   if (req.status === 200) {
-    const res = await req.json();
-    return res;
+    const data = await req.json();
+    return { data, message: successMessages.login };
+  } else if (req.status === 400) {
+    throw new Error(errorMessages.login);
   } else {
-    if (errorMessages[req.status] === undefined) {
-      throw new Error(errorMessages.unknown);
-    } else {
-      throw new Error(errorMessages[req.status]);
-    }
+    throw new Error(errorMessages.unknown);
   }
 }
 
-export async function postData(data, router, endpoint = "") {
-  const token = getToken();
+// Get all data
+export async function getAllData(route) {
+  const req = await fetch(baseURL + route);
+  if (req.status === 200) {
+    const { data } = await req.json();
+    return data;
+  } else {
+    throw new Error(errorMessages.unknown);
+  }
+}
 
-  const req = await fetch(baseURL + "/materials/" + endpoint, {
+// Add data
+export async function addData(route, data) {
+  const req = await fetch(baseURL + route, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -44,54 +47,41 @@ export async function postData(data, router, endpoint = "") {
     },
     body: JSON.stringify(data),
   });
-  console.log(req);
 
   if (req.status === 200) {
-    toast.success(errorMessages.succesfulyAdd);
-
-    const res = await req.json();
-    console.log(res);
-    return res;
+    const data = await req.json();
+    return { data, message: successMessages.add };
   } else if (req.status === 403) {
-    toast.error("Token vaqti tugagan iltimos qayta royhattan oting");
-
-    setTimeout(() => {
-      router.push("/login");
-      localStorage.removeItem("admin");
-    }, 3000);
-    throw new Error(errorMessages.unknownToken);
-  } else if (req.status === 400) {
-    throw new Error(errorMessages.post.unknownPost);
-  } else if (req.status === 500) {
-    throw new Error(errorMessages.post.unknownServer);
+    throw new Error(errorMessages[req.status]);
   } else {
-    throw new Error(req.status);
+    throw new Error(errorMessages.unknown);
   }
 }
 
-// GET request
-export async function getAllData(route) {
-  const req = await fetch(baseURL + route);
+// Update data
+export async function updateData(route, data) {
+  const req = await fetch(baseURL + route + data.id, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
   if (req.status === 200) {
-    const { data } = await req.json();
-    return data;
+    const data = await req.json();
+    return { data, message: successMessages.update };
+  } else if (req.status === 403) {
+    throw new Error(errorMessages[req.status]);
   } else {
-    if (req.status == 400) {
-      throw new Error(errorMessages.get.unknownGet);
-    } else if (req.status == 403) {
-      throw new Error(errorMessages.unknownToken);
-    } else {
-      throw new Error(errorMessages.get.unknownServer);
-    }
+    throw new Error(errorMessages.unknown);
   }
 }
 
-// DELETE request
-
-export async function deleteData(id = "", router = null) {
-  const token = getToken();
-
-  const req = await fetch(baseURL + "/materials/" + id, {
+// Delete data
+export async function deleteData(route, id) {
+  const req = await fetch(baseURL + route + id, {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -100,43 +90,10 @@ export async function deleteData(id = "", router = null) {
   });
 
   if (req.status === 200) {
-    toast.success("Ma'lumot ochirildi");
-    return true;
+    return { message: successMessages.delete };
   } else if (req.status === 403) {
-    toast.error(errorMessages.unknownToken);
-
-    setTimeout(() => {
-      router.push("/login");
-      localStorage.removeItem("admin");
-    }, 3000);
-    throw new Error(errorMessages.unknownToken);
-  } else if (req.status === 400) {
-    throw new Error(errorMessages.post.unknownDelete);
-  } else if (req.status === 500) {
-    throw new Error(errorMessages.post.unknownServer);
+    throw new Error(errorMessages[req.status]);
   } else {
-    throw new Error(req.status);
+    throw new Error(errorMessages.unknown);
   }
 }
-
-// request examples
-
-// delete request
-// {deleteRequest("/resurs/1")
-//   .then((response) => {
-//    toast.succes("Resurs o'chirildi:", response);
-//   })
-//   .catch((error) => {
-//     toast.error("Xato:", error.message);
-//   });
-// }
-
-// get materoials
-// async function fetchUsers() {
-//   try {
-//     const data = await getRequest(endpoint); // getRequest funksiyasini chaqiramiz
-//     toast.succes("Foydalanuvchilar:", data); // Olingan foydalanuvchilarni chiqarish
-//   } catch (error) {
-//     toast.error("Xato:", error.message); // Agar xato bo'lsa, konsolga chiqarish
-//   }
-// }
