@@ -1,12 +1,5 @@
 import { baseURL, errorMessages, successMessages } from "@/constants";
 
-let admin;
-if (typeof window !== "undefined") {
-  admin = JSON.parse(localStorage.getItem("admin"));
-}
-
-const token = admin ? admin.access_token : null;
-
 // Login
 export async function login(data) {
   const req = await fetch(baseURL + "/auth/login", {
@@ -38,7 +31,7 @@ export async function getAllData(route) {
 }
 
 // Add data
-export async function addData(route, data) {
+export async function addData(route, data, token) {
   const req = await fetch(baseURL + route, {
     method: "POST",
     headers: {

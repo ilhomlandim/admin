@@ -16,7 +16,7 @@ export default function TableData() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    getAllData("/materials?limit=10")
+    getAllData("/materials")
       .then((res) => {
         setData(res);
       })

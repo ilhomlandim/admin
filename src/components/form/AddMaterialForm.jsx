@@ -30,12 +30,13 @@ export default function AddMaterialForm() {
     action: "one",
   });
 
-  const { gAuthors, gKeywords, setAddItemDrawer, setAdmin } = useAppStore();
+  const { gAuthors, gKeywords, setAddItemDrawer, setAdmin, admin } =
+    useAppStore();
 
   useEffect(() => {
     if (data.addedData) {
-      addData("/materials", data.addedData)
-        .then(({ data, message }) => {
+      addData("/materials", data.addedData, admin.access_token)
+        .then(({ message }) => {
           toast.success(message);
         })
         .catch(({ message }) => {
