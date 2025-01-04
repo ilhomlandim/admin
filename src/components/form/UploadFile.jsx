@@ -6,6 +6,8 @@ import { useEffect, useRef, useState } from "react";
 import { uploadFile } from "@/requests";
 import { useAppStore } from "@/lib/zustand";
 import { Loader2 } from "lucide-react";
+import { allowImageSize, warnMessages } from "@/constants";
+import { toast } from "sonner";
 
 export default function UploadFile() {
   const { setGCoverImage, gCoverImage } = useAppStore();
@@ -31,27 +33,29 @@ export default function UploadFile() {
 
   function handleChange(e) {
     const file = e.target.files[0];
-    setData((prev) => {
-      return { ...prev, isLoading: true };
-    });
-    uploadFile(file)
-      .then((url) => {
-        setData((prev) => {
-          console.log(url);
-
-          return { ...prev, isLoading: false, url };
-        });
-      })
-      .catch(() => {
-        setData((prev) => {
-          return { ...prev };
-        });
-      })
-      .finally(() => {
-        setData((prev) => {
-          return { ...prev, isLoading: false };
-        });
+    if (file.size > allowImageSize) {
+      toast.warning(warnMessages.length.cover);
+    } else {
+      setData((prev) => {
+        return { ...prev, isLoading: true };
       });
+      uploadFile(file)
+        .then((url) => {
+          setData((prev) => {
+            return { ...prev, isLoading: false, url };
+          });
+        })
+        .catch(() => {
+          setData((prev) => {
+            return { ...prev };
+          });
+        })
+        .finally(() => {
+          setData((prev) => {
+            return { ...prev, isLoading: false };
+          });
+        });
+    }
   }
 
   return (

@@ -2,6 +2,8 @@ import { getUntilNow } from "@/lib/utils";
 
 export const baseURL = "https://json-api.uz/api/project/chizlab";
 
+export const allowImageSize = 4_194_304;
+
 export const successMessages = {
   login: "Tizimga muvaffaqiyatli kirdingiz",
   add: "Yangi ma'lumot qo'shildi",
@@ -36,6 +38,7 @@ export const warnMessages = {
   length: {
     inputKeywords: "Kalit so'z eng kamida 2 ta belgidan iborat bo'lishi kerak",
     inputAuthors: "Muallif eng kamida 6 belgidan iborat bo'lishi kerak",
+    cover: "Hajmi 4 mbdan yuqori bo'lgan rasmlarni yuklay olmaysiz",
   },
   has: {
     inputKeywords: "Ushbu kalit so'z allaqachon qo'shilgan",
