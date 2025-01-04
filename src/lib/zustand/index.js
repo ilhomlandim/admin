@@ -12,7 +12,7 @@ export const useAppStore = create((set) => {
     },
     gKeywords: [],
     gAuthors: [],
-    counter: 1,
+    gCoverImage: null,
     setAdmin(admin) {
       return set(() => {
         return { admin };
@@ -36,6 +36,13 @@ export const useAppStore = create((set) => {
       return set(() => {
         return {
           gAuthors,
+        };
+      });
+    },
+    setGCoverImage(url) {
+      return set(() => {
+        return {
+          gCoverImage: url,
         };
       });
     },

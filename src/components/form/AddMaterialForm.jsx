@@ -13,7 +13,7 @@ import KeywordsInput from "./KeywordsInput";
 import AuthoursInput from "./AuthorsInput";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
-import { BookmarkIcon, PlusIcon } from "@radix-ui/react-icons";
+import { BookmarkIcon, PlusIcon, UploadIcon } from "@radix-ui/react-icons";
 import { getFormData, validate } from "@/lib/utils";
 import { useAppStore } from "@/lib/zustand";
 import { toast } from "sonner";
@@ -21,6 +21,7 @@ import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { addData } from "@/requests";
+import UploadFile from "./UploadFile";
 
 export default function AddMaterialForm() {
   const router = useRouter();
@@ -30,8 +31,14 @@ export default function AddMaterialForm() {
     action: "one",
   });
 
-  const { gAuthors, gKeywords, setAddItemDrawer, setAdmin, admin } =
-    useAppStore();
+  const {
+    gAuthors,
+    gKeywords,
+    setAddItemDrawer,
+    setAdmin,
+    admin,
+    gCoverImage,
+  } = useAppStore();
 
   useEffect(() => {
     if (data.addedData) {
@@ -68,6 +75,7 @@ export default function AddMaterialForm() {
       ...getFormData(e.target),
       authors: gAuthors,
       keywords: gKeywords,
+      cover: gCoverImage,
     };
 
     const checkedResult = validate(result, "form");
@@ -79,7 +87,7 @@ export default function AddMaterialForm() {
     } else {
       const { target, message } = checkedResult;
       toast.warning(message);
-      e.target[target].focus();
+      e.target[target]?.focus();
     }
   }
   return (
@@ -95,7 +103,6 @@ export default function AddMaterialForm() {
             placeholder="Sarlavhani kiriting"
           />
         </div>
-
         {/* Volume  */}
         <div className="grid w-full items-center gap-1.5 col-start-2 col-end-4">
           <Label htmlFor="volume">Sahifalar soni*</Label>
@@ -107,20 +114,8 @@ export default function AddMaterialForm() {
             placeholder="Sahifalar sonini kiriting"
           />
         </div>
-
-        {/* Cover  */}
-        <div className="grid w-full items-center gap-1.5 col-start-1 col-end-3">
-          <Label htmlFor="cover">Rasm uchun havola*</Label>
-          <Input
-            type="text"
-            id="cover"
-            name="cover"
-            placeholder="Rasm uchun havolanini kiriting"
-          />
-        </div>
-
         {/* Published At */}
-        <Label className="grid w-full items-start gap-1.5">
+        <Label className="grid w-full items-start gap-1.5 col-start-1 col-end-3">
           <span>Chop etilgan yil*</span>
           <Select name="publishedAt">
             <SelectTrigger className="w-full">
@@ -137,7 +132,6 @@ export default function AddMaterialForm() {
             </SelectContent>
           </Select>
         </Label>
-
         {/* Country  */}
         <Label className="grid w-full items-start gap-1.5">
           <span>Davlat*</span>
@@ -156,9 +150,8 @@ export default function AddMaterialForm() {
             </SelectContent>
           </Select>
         </Label>
-
         {/* Language  */}
-        <Label className="grid w-full items-start gap-1.5 col-start-2 col-end-4">
+        <Label className="grid w-full items-start gap-1.5 col-start-1 col-end-4">
           <span>Til*</span>
           <Select name="language">
             <SelectTrigger className="w-full">
@@ -175,6 +168,9 @@ export default function AddMaterialForm() {
             </SelectContent>
           </Select>
         </Label>
+
+        {/* Cover */}
+        <UploadFile />
 
         {/* Resource type  */}
         <Label className="grid w-full items-start gap-1.5 col-start-1 col-end-3">
@@ -194,7 +190,6 @@ export default function AddMaterialForm() {
             </SelectContent>
           </Select>
         </Label>
-
         {/* Source  */}
         <div className="grid w-full items-center gap-1.5">
           <Label htmlFor="source">Manbaa*</Label>
@@ -239,12 +234,12 @@ export default function AddMaterialForm() {
         </Button>
 
         {!data.isLoading && (
-          <Button type="submit" id="one" variant="secondary">
+          <Button type="submit" id="more" variant="secondary">
             <PlusIcon className="mr-[2px]" />
             Qo'shish
           </Button>
         )}
-        <Button id="more" disabled={data.isLoading}>
+        <Button id="one" disabled={data.isLoading}>
           {data.isLoading ? (
             <>
               <Loader2 className="animate-spin" />

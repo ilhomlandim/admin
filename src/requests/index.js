@@ -90,3 +90,19 @@ export async function deleteData(route, id) {
     throw new Error(errorMessages.unknown);
   }
 }
+
+// Upload file
+export async function uploadFile(file) {
+  const formData = new FormData();
+  formData.append("file", file);
+  const req = await fetch(baseURL + "/upload", {
+    method: "POST",
+    body: formData,
+  });
+
+  if (req.status === 200) {
+    return req.text();
+  } else {
+    throw new Error(errorMessages.unknown);
+  }
+}

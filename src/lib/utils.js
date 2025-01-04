@@ -64,7 +64,7 @@ export function validate(element, type) {
       };
     }
 
-    if (isURL(cover) === false) {
+    if (cover === null) {
       return {
         target: "cover",
         message: warnMessages.empty.cover,

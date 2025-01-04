@@ -23,7 +23,7 @@ export const warnMessages = {
     inputAuthors: "Muallifni kiriting",
     title: "Sarlavhani kiriting",
     volume: "Sahifalar sonini kiriting",
-    cover: "Rasm uchun havolani kiriting",
+    cover: "Rasm yuklanmagan",
     publishedAt: "Chop etilgan yilni tanlang",
     country: "Davlatni tanlang",
     language: "Tilni tanlang",
