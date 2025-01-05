@@ -21,7 +21,14 @@ export async function login(data) {
 
 // Get all data
 export async function getAllData(route) {
-  const req = await fetch(baseURL + route);
+  const req = await fetch(baseURL + route, {
+    headers: {
+      "Cache-Control": "no-store",
+    },
+    next: {
+      revalidate: 0,
+    },
+  });
   if (req.status === 200) {
     const { data } = await req.json();
     return data;
