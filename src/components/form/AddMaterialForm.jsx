@@ -38,12 +38,16 @@ export default function AddMaterialForm() {
     setAdmin,
     admin,
     gCoverImage,
+    setMaterials,
   } = useAppStore();
+
+  console.log(admin);
 
   useEffect(() => {
     if (data.addedData) {
       addData("/materials", data.addedData, admin.access_token)
-        .then(({ message }) => {
+        .then(({ message, data }) => {
+          setMaterials(data, "one");
           toast.success(message);
         })
         .catch(({ message }) => {

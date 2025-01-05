@@ -18,14 +18,10 @@ export default function UploadFile() {
   });
 
   useEffect(() => {
-    console.log("Men ishladim");
-
     if (data.url) {
       setGCoverImage(data.url);
     }
   }, [data.url]);
-
-  console.log(data.url, gCoverImage);
 
   function handleClick() {
     inputRef.current?.click();

@@ -2,6 +2,7 @@ import { create } from "zustand";
 
 export const useAppStore = create((set) => {
   return {
+    materials: [],
     admin: null,
     addItemDrawer: {
       modal: false,
@@ -13,9 +14,18 @@ export const useAppStore = create((set) => {
     gKeywords: [],
     gAuthors: [],
     gCoverImage: null,
-    setAdmin(admin) {
+    setMaterials(materials, type) {
+      return set((state) => {
+        if (type === "one") {
+          return { materials: [...state.materials, materials] };
+        } else {
+          return { materials };
+        }
+      });
+    },
+    setAdmin(value) {
       return set(() => {
-        return { admin };
+        return { admin: value };
       });
     },
     setAddItemDrawer(value) {

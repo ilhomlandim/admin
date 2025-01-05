@@ -6,6 +6,7 @@ export const allowImageSize = 4_194_304;
 
 export const successMessages = {
   login: "Tizimga muvaffaqiyatli kirdingiz",
+  logout: "Tizimdan muvaffaqiyatli chiqdingiz",
   add: "Yangi ma'lumot qo'shildi",
   delete: "Ma'lumot o'chirildi",
   update: "Ma'lumot yangilandi",

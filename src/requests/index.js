@@ -73,7 +73,7 @@ export async function updateData(route, data) {
 }
 
 // Delete data
-export async function deleteData(route, id) {
+export async function deleteData(route, id, token) {
   const req = await fetch(baseURL + route + id, {
     method: "DELETE",
     headers: {

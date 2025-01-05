@@ -8,55 +8,80 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getAllData } from "@/requests";
+import { useAppStore } from "@/lib/zustand";
+import { deleteData, getAllData } from "@/requests";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { Button } from "./ui/button";
+import { TrashIcon } from "@radix-ui/react-icons";
 
 export default function TableData() {
-  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const { materials, setMaterials, admin } = useAppStore();
 
   useEffect(() => {
+    setLoading(true);
     getAllData("/materials")
       .then((res) => {
-        setData(res);
+        setMaterials(res, "more");
       })
       .catch(({ message }) => {
         toast.error(message);
       })
-      .finally(() => {});
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
   return (
     <div className="base-container py-10 h-full">
-      <Table>
-        <TableCaption>chizlab.uz saytidagi ma'lumotlar</TableCaption>
-        <TableHeader>
-          <TableRow>
-            <TableHead>ID</TableHead>
-            <TableHead>Sarlavha</TableHead>
-            <TableHead>Til</TableHead>
-            <TableHead>Davlat</TableHead>
-            <TableHead className="text-right">Sahifalar soni</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {data.map(({ id, title, language, country, volume }) => (
-            <TableRow key={id}>
-              <TableCell className="font-medium text-left">{id}</TableCell>
-              <TableCell className="relative">{title}</TableCell>
-              <TableCell>{language}</TableCell>
-              <TableCell>{country}</TableCell>
-              <TableCell className="text-right">{volume}</TableCell>
+      {loading ? (
+        <p>Yuklanmoqda...</p>
+      ) : (
+        <Table>
+          <TableCaption>chizlab.uz saytidagi ma'lumotlar</TableCaption>
+          <TableHeader className="w-full">
+            <TableRow>
+              <TableHead>ID</TableHead>
+              <TableHead>Sarlavha</TableHead>
+              <TableHead className="text-right">Sahifalar soni</TableHead>
+              <TableHead className="text-right">Harakatlar</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-        <TableFooter>
-          <TableRow>
-            <TableCell colSpan={4}>Jami ma'lumotlar</TableCell>
-            <TableCell className="text-right">{data.length}</TableCell>
-          </TableRow>
-        </TableFooter>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {materials.map(({ id, title, volume }) => (
+              <TableRow key={id}>
+                <TableCell className="font-medium text-left">{id}</TableCell>
+                <TableCell className="relative">{title}</TableCell>
+                <TableCell className="text-right">{volume}</TableCell>
+                <TableCell className="flex justify-end">
+                  <Button
+                    onClick={() => {
+                      if (confirm("O'chirmoqchisizi?"))
+                        deleteData("/materials/", id, admin.access_token).then(
+                          ({ message }) => {
+                            toast.success(message);
+                            window?.location.reload();
+                          }
+                        );
+                    }}
+                    variant="destructive"
+                    size="icon"
+                  >
+                    <TrashIcon />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TableCell colSpan={4}>Jami ma'lumotlar</TableCell>
+              <TableCell className="text-right">{materials.length}</TableCell>
+            </TableRow>
+          </TableFooter>
+        </Table>
+      )}
     </div>
   );
 }

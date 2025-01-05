@@ -1,21 +1,25 @@
 "use client";
-import { PlusCircledIcon } from "@radix-ui/react-icons";
+import { ExitIcon } from "@radix-ui/react-icons";
 import { Button } from "./ui/button";
 import Image from "next/image";
 import logoImage from "/public/dark-logo.svg";
 import { useAppStore } from "@/lib/zustand";
-import AddMaterialForm from "./form/AddMaterialForm";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { successMessages } from "@/constants";
 
 export default function Header() {
-  const { setAddItemDrawer } = useAppStore();
-  function handleDrawer() {
-    setAddItemDrawer({
-      title: "Yangi material qo'shish",
-      description:
-        "Bu yerga qo'shgan ma'lumotlarinigiz chizlab.uz saytida ko'rinadi",
-      width: 80,
-      children: <AddMaterialForm />,
-    });
+  const { setAdmin } = useAppStore();
+  const router = useRouter();
+
+  function handleClick() {
+    const confirm = window?.confirm("Tizimni tark etmoqchimisiz?");
+    if (confirm) {
+      setAdmin(null);
+      window?.localStorage.removeItem("admin");
+      router.replace("/login");
+      toast.info(successMessages.logout);
+    }
   }
 
   return (
@@ -29,13 +33,9 @@ export default function Header() {
           width="170"
           height="40"
         />
-        <Button
-          onClick={() => {
-            handleDrawer();
-          }}
-        >
-          <PlusCircledIcon className="mr-[2px]" />
-          Qo'shish
+        <Button onClick={handleClick}>
+          <ExitIcon />
+          Chiqish
         </Button>
       </div>
     </header>
