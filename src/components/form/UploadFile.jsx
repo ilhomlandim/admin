@@ -16,47 +16,74 @@ export default function UploadFile() {
     url: null,
     isLoading: false,
   });
+  useEffect(() => {
+    console.log("Data state updated:", data);
+  }, [data]);
 
   useEffect(() => {
-    if (data.url) {
-      setGCoverImage(data.url);
-    }
-  }, [data.url]);
+    console.log("gCoverImage updated:", gCoverImage);
+  }, [gCoverImage]);
+
+  // useEffect(() => {
+  //   if (data.url) {
+  //     setGCoverImage(data.url);
+  //     console.log(gCoverImage, "39 qator upload");
+  //   }
+  // }, [data.url]);
 
   function handleClick() {
     inputRef.current?.click();
   }
 
   function handleChange(e) {
+    console.log(e.target.files[0]);
+
     const file = e.target.files[0];
+    console.log(file, "35qator ");
+
     if (file.size > allowImageSize) {
       toast.warning(warnMessages.length.cover);
     } else {
-      setData((prev) => {
-        return { ...prev, isLoading: true };
+      setGCoverImage(file);
+      setData({
+        url: file,
+        isLoading: false,
       });
-      uploadFile(file)
-        .then((url) => {
-          setData((prev) => {
-            return { ...prev, isLoading: false, url };
-          });
-        })
-        .catch(() => {
-          setData((prev) => {
-            return { ...prev };
-          });
-        })
-        .finally(() => {
-          setData((prev) => {
-            return { ...prev, isLoading: false };
-          });
-        });
+      console.log(data);
+      console.log(gCoverImage, "img 43 qator");
+
+      // setData((prev) => {
+      //   return { ...prev, isLoading: false };
+      // });
+
+      // uploadFile(file)
+      //   .then((url) => {
+      //     setData((prev) => {
+      //       return { ...prev, isLoading: false, url };
+      //     });
+      //   })
+      //   .catch(() => {
+      //     setData((prev) => {
+      //       return { ...prev };
+      //     });
+      //   })
+      //   .finally(() => {
+      //     setData((prev) => {
+      //       return { ...prev, isLoading: false };
+      //     });
+      //   });]
+
+      setData((prev) => {
+        return { url: file, isLoading: false };
+      });
     }
+    console.log(data);
+    console.log(gCoverImage, "img 67 qator");
   }
 
   return (
     <div>
-      <div className="grid w-full items-center gap-1.5">
+      <div className="grid w-full items-center gap-1.5 ">
         <Label htmlFor="cover">Rasm uchun havola*</Label>
         {gCoverImage === null && (
           <Button

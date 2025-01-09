@@ -48,7 +48,7 @@ export const warnMessages = {
 };
 
 export const form = {
-  publishedAt: [...getUntilNow(1990)],
+  publishedAt: [...getUntilNow(1970)],
   countries: [
     "O'zbekiston",
     "Qoraqalpog'iston",
@@ -59,7 +59,7 @@ export const form = {
   ],
   languages: ["O'zbek", "Qoraqalpoq", "Turkman", "Rus", "Ingliz"],
   resourceTypes: [
-    "O'quv qo'llanma",
+    "Elektron o'quv qo'llanma",
     "Tezis",
     "Maqola",
     "Darslik",

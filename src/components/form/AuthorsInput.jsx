@@ -10,10 +10,12 @@ import { warnMessages } from "@/constants";
 import { XIcon } from "lucide-react";
 import { useAppStore } from "@/lib/zustand";
 
-export default function AuthoursInput() {
+export default function AuthoursInput({ data }) {
+  // console.log(data, "authors input");
+
   const { setGAuthors } = useAppStore();
   const inputRef = useRef(null);
-  const [authors, setAuthors] = useState([]);
+  const [authors, setAuthors] = useState(data?.authors || []);
 
   function handleAdd() {
     const value = inputRef.current.value;
@@ -49,6 +51,8 @@ export default function AuthoursInput() {
   }
 
   useEffect(() => {
+    // console.log(authors, "avtorlar use effekt");
+
     setGAuthors(authors);
   }, [authors]);
 

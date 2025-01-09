@@ -20,17 +20,20 @@ import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { addData } from "@/requests";
+import { addData, updateData, uploadFile } from "@/requests";
 import UploadFile from "./UploadFile";
 
-export default function AddMaterialForm() {
+export default function AddMaterialForm(props) {
+  const { changeData } = props;
+  // console.log("28qator ozgartirish malumotlari", changeData);
+
   const router = useRouter();
+
   const [data, setData] = useState({
     addedData: null,
     isLoading: false,
     action: "one",
   });
-
   const {
     gAuthors,
     gKeywords,
@@ -38,14 +41,19 @@ export default function AddMaterialForm() {
     setAdmin,
     admin,
     gCoverImage,
+    setGCoverImage,
     setMaterials,
   } = useAppStore();
 
-  console.log(admin);
-
+  // console.log(admin);
   useEffect(() => {
-    if (data.addedData) {
-      addData("/materials", data.addedData, admin.access_token)
+    if (changeData && data.addedData) {
+      updateData(
+        "/materials",
+        data.addedData,
+        changeData?.id,
+        admin.access_token
+      )
         .then(({ message, data }) => {
           setMaterials(data, "one");
           toast.success(message);
@@ -68,8 +76,79 @@ export default function AddMaterialForm() {
             setAddItemDrawer(null);
           }
         });
+    } else if (data.addedData && !changeData) {
+      if (gCoverImage) {
+        uploadFile(gCoverImage)
+          .then((url) => {
+            setData((prev) => {
+              return { ...prev, isLoading: false, url };
+            });
+            sendData();
+          })
+          .catch(() => {
+            setData((prev) => {
+              return { ...prev };
+            });
+          })
+          .finally(() => {
+            setData((prev) => {
+              return { ...prev, isLoading: false };
+            });
+          });
+
+        // addData("/materials", data.addedData, admin.access_token)
+        //   .then(({ message, data }) => {
+        //     setMaterials(data, "one");
+        //     toast.success(message);
+        //   })
+        //   .catch(({ message }) => {
+        //     if (message === errorMessages[403]) {
+        //       setAdmin(null);
+        //       router.push("/");
+        //       if (typeof window !== "undefined") {
+        //         localStorage.removeItem("user");
+        //       }
+        //     }
+        //     toast.error(message);
+        //   })
+        //   .finally(() => {
+        //     setData((prev) => {
+        //       return { ...prev, isLoading: false, addedData: null };
+        //     });
+        //     if (data.action === "one") {
+        //       setAddItemDrawer(null);
+        //     }
+        //   });
+      }
     }
   }, [data.addedData]);
+
+  function sendData() {
+    addData("/materials", data.addedData, admin.access_token)
+      .then(({ message, data }) => {
+        setMaterials(data, "one");
+        setGCoverImage(null);
+        toast.success(message);
+      })
+      .catch(({ message }) => {
+        if (message === errorMessages[403]) {
+          setAdmin(null);
+          router.push("/");
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("user");
+          }
+        }
+        toast.error(message);
+      })
+      .finally(() => {
+        setData((prev) => {
+          return { ...prev, isLoading: false, addedData: null };
+        });
+        if (data.action === "one") {
+          setAddItemDrawer(null);
+        }
+      });
+  }
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -103,6 +182,7 @@ export default function AddMaterialForm() {
           <Input
             type="text"
             id="title"
+            defaultValue={changeData?.title || ""}
             name="title"
             placeholder="Sarlavhani kiriting"
           />
@@ -114,6 +194,7 @@ export default function AddMaterialForm() {
             type="number"
             id="volume"
             name="volume"
+            defaultValue={changeData?.volume || ""}
             min="1"
             placeholder="Sahifalar sonini kiriting"
           />
@@ -121,7 +202,10 @@ export default function AddMaterialForm() {
         {/* Published At */}
         <Label className="grid w-full items-start gap-1.5 col-start-1 col-end-3">
           <span>Chop etilgan yil*</span>
-          <Select name="publishedAt">
+          <Select
+            name="publishedAt"
+            defaultValue={changeData?.publishedAt || ""}
+          >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Chop etilgan yilni tanlang" />
             </SelectTrigger>
@@ -139,7 +223,7 @@ export default function AddMaterialForm() {
         {/* Country  */}
         <Label className="grid w-full items-start gap-1.5">
           <span>Davlat*</span>
-          <Select name="country">
+          <Select name="country" defaultValue={changeData?.country || ""}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Davlatni tanlang" />
             </SelectTrigger>
@@ -157,15 +241,16 @@ export default function AddMaterialForm() {
         {/* Language  */}
         <Label className="grid w-full items-start gap-1.5 col-start-1 col-end-4">
           <span>Til*</span>
-          <Select name="language">
+
+          <Select name="language" defaultValue={changeData?.language || ""}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Tilni tanlang" />
             </SelectTrigger>
             <SelectContent>
               {form.languages.map((lang) => {
                 return (
-                  <SelectItem key={lang} value={lang}>
-                    {lang}
+                  <SelectItem key={lang} value={lang.toLowerCase()}>
+                    {lang.toLowerCase()}
                   </SelectItem>
                 );
               })}
@@ -174,12 +259,15 @@ export default function AddMaterialForm() {
         </Label>
 
         {/* Cover */}
-        <UploadFile />
+        <UploadFile isLoading={data.isLoading} />
 
         {/* Resource type  */}
         <Label className="grid w-full items-start gap-1.5 col-start-1 col-end-3">
           <span>Resurs turi*</span>
-          <Select name="resourceType">
+          <Select
+            name="resourceType"
+            defaultValue={changeData?.resourceType || ""}
+          >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Resurs turini tanlang" />
             </SelectTrigger>
@@ -200,6 +288,7 @@ export default function AddMaterialForm() {
           <Input
             type="text"
             id="source"
+            defaultValue={changeData?.source || ""}
             name="source"
             placeholder="Manbaa uchun havolanini kiriting"
           />
@@ -208,10 +297,10 @@ export default function AddMaterialForm() {
 
       <div className="flex flex-col gap-6">
         {/* Keywords  */}
-        <KeywordsInput />
+        <KeywordsInput data={changeData} />
 
         {/* Authors  */}
-        <AuthoursInput />
+        <AuthoursInput data={changeData} />
 
         {/* Summary  */}
         <div className="grid w-full gap-1.5">
@@ -220,6 +309,7 @@ export default function AddMaterialForm() {
             className="min-h-24"
             placeholder="Material uchun tavsif yozing..."
             id="summary"
+            defaultValue={changeData?.summary || ""}
             name="summary"
           />
         </div>
@@ -237,12 +327,18 @@ export default function AddMaterialForm() {
           Bekor qilish
         </Button>
 
-        {!data.isLoading && (
-          <Button type="submit" id="more" variant="secondary">
-            <PlusIcon className="mr-[2px]" />
-            Qo'shish
-          </Button>
-        )}
+        {!data.isLoading &&
+          (!changeData ? (
+            <Button type="submit" id="more" variant="secondary">
+              <PlusIcon className="mr-[2px]" />
+              Qo'shish
+            </Button>
+          ) : (
+            <Button type="submit" id="more" variant="secondary">
+              <PlusIcon className="mr-[2px]" />
+              Yangilash
+            </Button>
+          ))}
         <Button id="one" disabled={data.isLoading}>
           {data.isLoading ? (
             <>
