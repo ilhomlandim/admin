@@ -31,10 +31,28 @@ export async function getAllData(route) {
   });
   if (req.status === 200) {
     const { data } = await req.json();
+
     return data;
   } else {
     throw new Error(errorMessages.unknown);
   }
+}
+// get data by id
+export async function getDataById(id) {
+  const res = await fetch(`${baseURL}/materials/${id}`, {
+    method: "GET",
+    headers: {
+      "Cache-Control": "no-store",
+    },
+  });
+
+  if (!res.ok) {
+    const error = await res.json();
+    return Promise.reject(new Error(error.message || "Unknown error occurred"));
+  }
+
+  const data = await res.json();
+  return data;
 }
 
 // Add data
@@ -59,8 +77,8 @@ export async function addData(route, data, token) {
 }
 
 // Update data
-export async function updateData(route, data) {
-  const req = await fetch(baseURL + route + data.id, {
+export async function updateData(route, data, id, token) {
+  const req = await fetch(baseURL + route + id, {
     method: "PATCH",
     headers: {
       Authorization: `Bearer ${token}`,

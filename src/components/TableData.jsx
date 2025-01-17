@@ -9,16 +9,34 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useAppStore } from "@/lib/zustand";
-import { deleteData, getAllData } from "@/requests";
+import { deleteData, getAllData, getDataById } from "@/requests";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
 import { TrashIcon } from "@radix-ui/react-icons";
+import { PenBoxIcon } from "lucide-react";
+import AddMaterialForm from "./form/AddMaterialForm";
 
 export default function TableData() {
   const [loading, setLoading] = useState(false);
   const { materials, setMaterials, admin } = useAppStore();
+  const { gAuthors, gKeywords, setAddItemDrawer, setAdmin, gCoverImage } =
+    useAppStore();
+  function getDataId(data) {
+    setLoading(true);
+    handleDrawer(data);
+    setMaterials(data, "more");
+  }
 
+  function handleDrawer(data) {
+    setAddItemDrawer({
+      title: "Yangi material qo'shish",
+      description:
+        "Bu yerga qo'shgan ma'lumotlarinigiz chizlab.uz saytida ko'rinadi",
+      width: 80,
+      children: <AddMaterialForm changeData={data} />,
+    });
+  }
   useEffect(() => {
     setLoading(true);
     getAllData("/materials")
@@ -49,15 +67,31 @@ export default function TableData() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {materials.map(({ id, title, volume }) => (
-              <TableRow key={id}>
-                <TableCell className="font-medium text-left">{id}</TableCell>
-                <TableCell className="relative">{title}</TableCell>
-                <TableCell className="text-right">{volume}</TableCell>
-                <TableCell className="flex justify-end">
+            {materials.map((material) => (
+              // {materials.map(({ id, title, volume }) => (
+
+              <TableRow key={material.id}>
+                <TableCell className="font-medium text-left">
+                  {material.id}
+                </TableCell>
+                <TableCell className="relative">{material.title}</TableCell>
+                <TableCell className="text-right">{material.volume}</TableCell>
+                <TableCell className="flex justify-end gap-4 ">
                   <Button
                     onClick={() => {
-                      if (confirm("O'chirmoqchisizi?"))
+                      if (confirm("O'zgartirmoqchisiz?")) {
+                        toast.info("edit mode on");
+                        getDataId(material);
+                      }
+                    }}
+                    variant="secondary"
+                    size="icon"
+                  >
+                    <PenBoxIcon />
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      if (confirm("O'chirmoqchisiz?"))
                         deleteData("/materials/", id, admin.access_token).then(
                           ({ message }) => {
                             toast.success(message);
