@@ -12,31 +12,24 @@ import { useAppStore } from "@/lib/zustand";
 import { deleteData, getAllData, getDataById } from "@/requests";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Button } from "./ui/button";
+import { buttonVariants } from "./ui/button";
 import { TrashIcon } from "@radix-ui/react-icons";
-import { PenBoxIcon } from "lucide-react";
-import AddMaterialForm from "./form/AddMaterialForm";
+import { errorMessages } from "@/constants";
+import { Eye, Info, Loader2Icon, Pencil } from "lucide-react";
+import { redirect } from "next/navigation";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function TableData() {
   const [loading, setLoading] = useState(false);
-  const { materials, setMaterials, admin } = useAppStore();
-  const { gAuthors, gKeywords, setAddItemDrawer, setAdmin, gCoverImage } =
-    useAppStore();
-  function getDataId(data) {
-    setLoading(true);
-    handleDrawer(data);
-    setMaterials(data, "more");
-  }
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deletedData, setDeletedData] = useState(false);
+  const { materials, setMaterials, admin, setAdmin } = useAppStore();
 
-  function handleDrawer(data) {
-    setAddItemDrawer({
-      title: "Yangi material qo'shish",
-      description:
-        "Bu yerga qo'shgan ma'lumotlarinigiz chizlab.uz saytida ko'rinadi",
-      width: 80,
-      children: <AddMaterialForm changeData={data} />,
-    });
-  }
   useEffect(() => {
     setLoading(true);
     getAllData("/materials")
@@ -51,6 +44,33 @@ export default function TableData() {
       });
   }, []);
 
+  useEffect(() => {
+    if (deletedData) {
+      setDeleteLoading(true);
+      deleteData("/materials/", deletedData, admin.access_token)
+        .then(({ message }) => {
+          toast.success(message);
+          const result = materials.filter((el) => el.id !== deletedData);
+          setMaterials(result);
+        })
+        .catch(({ message }) => {
+          if (message === errorMessages[403]) {
+            setAdmin(null);
+            localStorage.removeItem("admin");
+            redirect("/login");
+          }
+          toast.error(message);
+        })
+        .finally(() => {
+          setDeleteLoading(false);
+        });
+    }
+  }, [deletedData]);
+
+  function handleDelete(id) {
+    setDeletedData(id);
+  }
+
   return (
     <div className="base-container py-10 h-full">
       {loading ? (
@@ -62,55 +82,97 @@ export default function TableData() {
             <TableRow>
               <TableHead>ID</TableHead>
               <TableHead>Sarlavha</TableHead>
-              <TableHead className="text-right">Sahifalar soni</TableHead>
               <TableHead className="text-right">Harakatlar</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {materials.map((material) => (
-              // {materials.map(({ id, title, volume }) => (
+            {materials.map(({ id, title, volume }) => (
+              <TableRow key={id}>
+                <TableCell className="font-medium text-left">{id}</TableCell>
+                <TableCell className="relative">{title}</TableCell>
+                <TableCell className="flex gap-3 justify-end">
+                  {/* Info  */}
+                  <TooltipProvider delayDuration="0">
+                    <Tooltip>
+                      <TooltipTrigger
+                        className={buttonVariants({
+                          variant: "ghost",
+                          size: "icon",
+                        })}
+                      >
+                        <Info />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Ma'lumot olish</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
 
-              <TableRow key={material.id}>
-                <TableCell className="font-medium text-left">
-                  {material.id}
-                </TableCell>
-                <TableCell className="relative">{material.title}</TableCell>
-                <TableCell className="text-right">{material.volume}</TableCell>
-                <TableCell className="flex justify-end gap-4 ">
-                  <Button
-                    onClick={() => {
-                      if (confirm("O'zgartirmoqchisiz?")) {
-                        toast.info("edit mode on");
-                        getDataId(material);
-                      }
-                    }}
-                    variant="secondary"
-                    size="icon"
-                  >
-                    <PenBoxIcon />
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      if (confirm("O'chirmoqchisiz?"))
-                        deleteData("/materials/", id, admin.access_token).then(
-                          ({ message }) => {
-                            toast.success(message);
-                            window?.location.reload();
-                          }
-                        );
-                    }}
-                    variant="destructive"
-                    size="icon"
-                  >
-                    <TrashIcon />
-                  </Button>
+                  {/* Set Active  */}
+                  <TooltipProvider delayDuration="0">
+                    <Tooltip>
+                      <TooltipTrigger
+                        className={buttonVariants({
+                          variant: "outline",
+                          size: "icon",
+                        })}
+                      >
+                        <Eye />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Berkitish</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
+                  {/* Edit  */}
+                  <TooltipProvider delayDuration="0">
+                    <Tooltip>
+                      <TooltipTrigger
+                        className={buttonVariants({
+                          variant: "secondary",
+                          size: "icon",
+                        })}
+                      >
+                        <Pencil />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Tahrirlash</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
+                  {/* Delete  */}
+                  <TooltipProvider delayDuration="0">
+                    <Tooltip>
+                      <TooltipTrigger
+                        onClick={() => {
+                          if (confirm("O'chirmoqchisizi?")) handleDelete(id);
+                        }}
+                        className={buttonVariants({
+                          variant: "destructive",
+                          size: "icon",
+                        })}
+                        disabled={deletedData === id}
+                      >
+                        {deletedData === id && deleteLoading ? (
+                          <Loader2Icon className="animate-spin" />
+                        ) : (
+                          <TrashIcon />
+                        )}
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>O'chirish</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
           <TableFooter>
             <TableRow>
-              <TableCell colSpan={4}>Jami ma'lumotlar</TableCell>
+              <TableCell colSpan={2}>Jami ma'lumotlar</TableCell>
               <TableCell className="text-right">{materials.length}</TableCell>
             </TableRow>
           </TableFooter>

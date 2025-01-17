@@ -9,10 +9,9 @@ import { warnMessages } from "@/constants";
 import { XIcon } from "lucide-react";
 import { useAppStore } from "@/lib/zustand";
 
-export default function KeywordsInput({ data }) {
-  const { setGKeywords } = useAppStore();
+export default function KeywordsInput() {
+  const { setGKeywords, gKeywords } = useAppStore();
   const inputRef = useRef(null);
-  const [keywords, setKeywords] = useState(data?.keywords || []);
   function handleAdd() {
     const value = inputRef.current.value;
     const length = value.trim().length;
@@ -27,28 +26,21 @@ export default function KeywordsInput({ data }) {
       return;
     }
 
-    setKeywords((prev) => {
-      const is = prev.includes(value);
-      if (is) {
-        toast.warning(warnMessages.has.inputKeywords);
-        return prev;
-      } else {
-        return [...prev, value];
-      }
-    });
+    const is = gKeywords.includes(value);
+    if (is) {
+      toast.warning(warnMessages.has.inputKeywords);
+    } else {
+      setGKeywords([...gKeywords, value]);
+    }
 
     inputRef.current.value = "";
     inputRef.current.focus();
   }
 
   function handleDelete(id) {
-    const result = keywords.filter((keyword) => keyword !== id);
-    setKeywords(result);
+    const result = gKeywords.filter((keyword) => keyword !== id);
+    setGKeywords(result);
   }
-
-  useEffect(() => {
-    setGKeywords(keywords);
-  }, [keywords]);
 
   return (
     <div>
@@ -73,11 +65,11 @@ export default function KeywordsInput({ data }) {
         </div>
       </div>
 
-      {keywords.length === 0 ? (
+      {gKeywords.length === 0 ? (
         <Badge variant="secondary">! Hali kalit so'z qo'shilmadi</Badge>
       ) : (
         <ul className="flex flex-wrap gap-1">
-          {keywords.map((keyword, index) => {
+          {gKeywords.map((keyword, index) => {
             return (
               <Badge key={index} variant="outline">
                 <XIcon

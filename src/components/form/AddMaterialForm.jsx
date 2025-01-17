@@ -13,14 +13,14 @@ import KeywordsInput from "./KeywordsInput";
 import AuthoursInput from "./AuthorsInput";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
-import { BookmarkIcon, PlusIcon, UploadIcon } from "@radix-ui/react-icons";
+import { BookmarkIcon, PlusIcon } from "@radix-ui/react-icons";
 import { getFormData, validate } from "@/lib/utils";
 import { useAppStore } from "@/lib/zustand";
 import { toast } from "sonner";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { addData, updateData, uploadFile } from "@/requests";
+import { addData, uploadFile } from "@/requests";
 import UploadFile from "./UploadFile";
 
 export default function AddMaterialForm(props) {
@@ -34,26 +34,41 @@ export default function AddMaterialForm(props) {
     isLoading: false,
     action: "one",
   });
+  const formRef = useRef(null);
+  const [selectedYear, setSelectedYear] = useState(undefined);
+  const [selectedCountry, setSelectedCountry] = useState(undefined);
+  const [selectedLanguage, setSelectedLanguage] = useState(undefined);
+  const [selectedResourceType, setSelectedResourceType] = useState(undefined);
+
   const {
     gAuthors,
     gKeywords,
-    setAddItemDrawer,
-    setAdmin,
-    admin,
     gCoverImage,
+    admin,
+    setGAuthors,
+    setGKeywords,
     setGCoverImage,
+    setAddItemDrawer,
     setMaterials,
+    setAdmin,
   } = useAppStore();
 
-  // console.log(admin);
+  function reset() {
+    formRef?.current?.reset();
+    setSelectedYear(undefined);
+    setSelectedCountry(undefined);
+    setSelectedLanguage(undefined);
+    setSelectedResourceType(undefined);
+    setGAuthors([]);
+    setGKeywords([]);
+    setGCoverImage(null);
+  }
+
   useEffect(() => {
-    if (changeData && data.addedData) {
-      updateData(
-        "/materials",
-        data.addedData,
-        changeData?.id,
-        admin.access_token
-      )
+    async function send(data) {
+      const changeFileToLink = await uploadFile(data.cover);
+      data.cover = changeFileToLink;
+      addData("/materials", data, admin.access_token)
         .then(({ message, data }) => {
           setMaterials(data, "one");
           toast.success(message);
@@ -72,83 +87,10 @@ export default function AddMaterialForm(props) {
           setData((prev) => {
             return { ...prev, isLoading: false, addedData: null };
           });
-          if (data.action === "one") {
-            setAddItemDrawer(null);
-          }
         });
-    } else if (data.addedData && !changeData) {
-      if (gCoverImage) {
-        uploadFile(gCoverImage)
-          .then((url) => {
-            setData((prev) => {
-              return { ...prev, isLoading: false, url };
-            });
-            sendData();
-          })
-          .catch(() => {
-            setData((prev) => {
-              return { ...prev };
-            });
-          })
-          .finally(() => {
-            setData((prev) => {
-              return { ...prev, isLoading: false };
-            });
-          });
-
-        // addData("/materials", data.addedData, admin.access_token)
-        //   .then(({ message, data }) => {
-        //     setMaterials(data, "one");
-        //     toast.success(message);
-        //   })
-        //   .catch(({ message }) => {
-        //     if (message === errorMessages[403]) {
-        //       setAdmin(null);
-        //       router.push("/");
-        //       if (typeof window !== "undefined") {
-        //         localStorage.removeItem("user");
-        //       }
-        //     }
-        //     toast.error(message);
-        //   })
-        //   .finally(() => {
-        //     setData((prev) => {
-        //       return { ...prev, isLoading: false, addedData: null };
-        //     });
-        //     if (data.action === "one") {
-        //       setAddItemDrawer(null);
-        //     }
-        //   });
-      }
     }
+    if (data.addedData) send(data.addedData);
   }, [data.addedData]);
-
-  function sendData() {
-    addData("/materials", data.addedData, admin.access_token)
-      .then(({ message, data }) => {
-        setMaterials(data, "one");
-        setGCoverImage(null);
-        toast.success(message);
-      })
-      .catch(({ message }) => {
-        if (message === errorMessages[403]) {
-          setAdmin(null);
-          router.push("/");
-          if (typeof window !== "undefined") {
-            localStorage.removeItem("user");
-          }
-        }
-        toast.error(message);
-      })
-      .finally(() => {
-        setData((prev) => {
-          return { ...prev, isLoading: false, addedData: null };
-        });
-        if (data.action === "one") {
-          setAddItemDrawer(null);
-        }
-      });
-  }
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -174,8 +116,12 @@ export default function AddMaterialForm(props) {
     }
   }
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col pl-1 pr-2 gap-y-6">
-      <div className="grid grid-cols-3  gap-x-5 gap-y-6">
+    <form
+      onSubmit={handleSubmit}
+      ref={formRef}
+      className="flex flex-col pl-1 pr-2 gap-y-6"
+    >
+      <div className="grid grid-cols-3 gap-x-5 gap-y-6">
         {/* Title  */}
         <div className="grid w-full items-center gap-1.5">
           <Label htmlFor="title">Sarlavha*</Label>
@@ -199,61 +145,54 @@ export default function AddMaterialForm(props) {
             placeholder="Sahifalar sonini kiriting"
           />
         </div>
+
         {/* Published At */}
         <Label className="grid w-full items-start gap-1.5 col-start-1 col-end-3">
           <span>Chop etilgan yil*</span>
-          <Select
-            name="publishedAt"
-            defaultValue={changeData?.publishedAt || ""}
-          >
+          <Select value={selectedYear} onValueChange={setSelectedYear}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Chop etilgan yilni tanlang" />
             </SelectTrigger>
             <SelectContent>
-              {form.publishedAt.map((year) => {
-                return (
-                  <SelectItem key={year} value={year.toString()}>
-                    {year}
-                  </SelectItem>
-                );
-              })}
+              {form.publishedAt.map((year) => (
+                <SelectItem key={year} value={year.toString()}>
+                  {year}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </Label>
-        {/* Country  */}
+
+        {/* Country */}
         <Label className="grid w-full items-start gap-1.5">
           <span>Davlat*</span>
-          <Select name="country" defaultValue={changeData?.country || ""}>
+          <Select value={selectedCountry} onValueChange={setSelectedCountry}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Davlatni tanlang" />
             </SelectTrigger>
             <SelectContent>
-              {form.countries.map((country) => {
-                return (
-                  <SelectItem key={country} value={country}>
-                    {country}
-                  </SelectItem>
-                );
-              })}
+              {form.countries.map((country) => (
+                <SelectItem key={country} value={country}>
+                  {country}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </Label>
-        {/* Language  */}
+
+        {/* Language */}
         <Label className="grid w-full items-start gap-1.5 col-start-1 col-end-4">
           <span>Til*</span>
-
-          <Select name="language" defaultValue={changeData?.language || ""}>
+          <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Tilni tanlang" />
             </SelectTrigger>
             <SelectContent>
-              {form.languages.map((lang) => {
-                return (
-                  <SelectItem key={lang} value={lang.toLowerCase()}>
-                    {lang.toLowerCase()}
-                  </SelectItem>
-                );
-              })}
+              {form.languages.map((lang) => (
+                <SelectItem key={lang} value={lang}>
+                  {lang}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </Label>
@@ -261,28 +200,27 @@ export default function AddMaterialForm(props) {
         {/* Cover */}
         <UploadFile isLoading={data.isLoading} />
 
-        {/* Resource type  */}
+        {/* Resource type */}
         <Label className="grid w-full items-start gap-1.5 col-start-1 col-end-3">
           <span>Resurs turi*</span>
           <Select
-            name="resourceType"
-            defaultValue={changeData?.resourceType || ""}
+            value={selectedResourceType}
+            onValueChange={setSelectedResourceType}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Resurs turini tanlang" />
             </SelectTrigger>
             <SelectContent>
-              {form.resourceTypes.map((resourceType) => {
-                return (
-                  <SelectItem key={resourceType} value={resourceType}>
-                    {resourceType}
-                  </SelectItem>
-                );
-              })}
+              {form.resourceTypes.map((resourceType) => (
+                <SelectItem key={resourceType} value={resourceType}>
+                  {resourceType}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </Label>
-        {/* Source  */}
+
+        {/* Source */}
         <div className="grid w-full items-center gap-1.5">
           <Label htmlFor="source">Manbaa*</Label>
           <Input
@@ -296,13 +234,13 @@ export default function AddMaterialForm(props) {
       </div>
 
       <div className="flex flex-col gap-6">
-        {/* Keywords  */}
-        <KeywordsInput data={changeData} />
+        {/* Keywords */}
+        <KeywordsInput />
 
-        {/* Authors  */}
-        <AuthoursInput data={changeData} />
+        {/* Authors */}
+        <AuthoursInput />
 
-        {/* Summary  */}
+        {/* Summary */}
         <div className="grid w-full gap-1.5">
           <Label htmlFor="summary">Tavsif*</Label>
           <Textarea
@@ -315,10 +253,11 @@ export default function AddMaterialForm(props) {
         </div>
       </div>
 
-      {/* Actions  */}
+      {/* Actions */}
       <div className="flex justify-end gap-3">
         <Button
           onClick={() => {
+            reset();
             setAddItemDrawer(null);
           }}
           type="reset"
@@ -327,18 +266,12 @@ export default function AddMaterialForm(props) {
           Bekor qilish
         </Button>
 
-        {!data.isLoading &&
-          (!changeData ? (
-            <Button type="submit" id="more" variant="secondary">
-              <PlusIcon className="mr-[2px]" />
-              Qo'shish
-            </Button>
-          ) : (
-            <Button type="submit" id="more" variant="secondary">
-              <PlusIcon className="mr-[2px]" />
-              Yangilash
-            </Button>
-          ))}
+        {!data.isLoading && (
+          <Button type="submit" id="more" variant="secondary">
+            <PlusIcon />
+            Qo'shish
+          </Button>
+        )}
         <Button id="one" disabled={data.isLoading}>
           {data.isLoading ? (
             <>
@@ -347,7 +280,7 @@ export default function AddMaterialForm(props) {
             </>
           ) : (
             <>
-              <BookmarkIcon className="mr-[2px]" />
+              <BookmarkIcon />
               Saqlash
             </>
           )}

@@ -10,12 +10,9 @@ import { warnMessages } from "@/constants";
 import { XIcon } from "lucide-react";
 import { useAppStore } from "@/lib/zustand";
 
-export default function AuthoursInput({ data }) {
-  // console.log(data, "authors input");
-
-  const { setGAuthors } = useAppStore();
+export default function AuthoursInput() {
+  const { setGAuthors, gAuthors } = useAppStore();
   const inputRef = useRef(null);
-  const [authors, setAuthors] = useState(data?.authors || []);
 
   function handleAdd() {
     const value = inputRef.current.value;
@@ -31,30 +28,21 @@ export default function AuthoursInput({ data }) {
       return;
     }
 
-    setAuthors((prev) => {
-      const is = prev.includes(value);
-      if (is) {
-        toast.warning(warnMessages.has.inputAuthors);
-        return prev;
-      } else {
-        return [...prev, value];
-      }
-    });
+    const is = gAuthors.includes(value);
+    if (is) {
+      toast.warning(warnMessages.has.inputAuthors);
+    } else {
+      setGAuthors([...gAuthors, value]);
+    }
 
     inputRef.current.value = "";
     inputRef.current.focus();
   }
 
   function handleDelete(id) {
-    const result = authors.filter((keyword) => keyword !== id);
-    setAuthors(result);
+    const result = gAuthors.filter((keyword) => keyword !== id);
+    setGAuthors(result);
   }
-
-  useEffect(() => {
-    // console.log(authors, "avtorlar use effekt");
-
-    setGAuthors(authors);
-  }, [authors]);
 
   return (
     <div>
@@ -79,11 +67,11 @@ export default function AuthoursInput({ data }) {
         </div>
       </div>
 
-      {authors.length === 0 ? (
+      {gAuthors.length === 0 ? (
         <Badge variant="secondary">! Hali muallif qo'shilmadi</Badge>
       ) : (
         <ul className="flex flex-wrap gap-1">
-          {authors.map((auth, index) => {
+          {gAuthors.map((auth, index) => {
             return (
               <Badge key={index} variant="outline">
                 <XIcon

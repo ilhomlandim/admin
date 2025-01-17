@@ -50,14 +50,14 @@ export function validate(element, type) {
       keywords,
     } = element;
 
-    if (title.trim().length === 0) {
+    if (title?.trim().length === 0) {
       return {
         target: "title",
         message: warnMessages.empty.title,
       };
     }
 
-    if (volume.trim().length === 0) {
+    if (volume?.trim().length === 0) {
       return {
         target: "volume",
         message: warnMessages.empty.volume,
@@ -71,22 +71,22 @@ export function validate(element, type) {
       };
     }
 
-    if (publishedAt.trim().length === 0) {
+    if (publishedAt?.trim().length === 0) {
       return {
         target: "publishedAt",
         message: warnMessages.empty.publishedAt,
       };
     }
 
-    if (country === "") {
+    if (country === null) {
       return { target: "country", message: warnMessages.empty.country };
     }
 
-    if (language === "") {
+    if (language === null) {
       return { target: "language", message: warnMessages.empty.language };
     }
 
-    if (resourceType === "") {
+    if (resourceType === null) {
       return {
         target: "resourceType",
         message: warnMessages.empty.resourceType,
@@ -100,21 +100,21 @@ export function validate(element, type) {
       };
     }
 
-    if (keywords.length === 0) {
+    if (keywords?.length === 0) {
       return {
         target: "keywords",
         message: warnMessages.empty.keywords,
       };
     }
 
-    if (authors.length === 0) {
+    if (authors?.length === 0) {
       return {
         target: "authors",
         message: warnMessages.empty.authors,
       };
     }
 
-    if (summary.trim().length === 0) {
+    if (summary?.trim().length === 0) {
       return {
         target: "summary",
         message: warnMessages.empty.summary,
